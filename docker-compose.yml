@@ -1,0 +1,34 @@
+services:
+  app:
+    container_name: node-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./ssl:/etc/postgresql/ssl # SSL証明書をマウント
+    command: >
+      postgres -c ssl=on
+               -c ssl_cert_file=/etc/postgresql/ssl/server.crt
+               -c ssl_key_file=/etc/postgresql/ssl/server.key
+
+volumes:
+  postgres_data:

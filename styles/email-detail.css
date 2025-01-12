@@ -1,0 +1,92 @@
+.email-detail-container {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.editable-title {
+  font-size: 32px; /* タイトルのフォントサイズを大きくする */
+  font-weight: bold; /* 太字にする */
+  margin-bottom: 20px;
+  width: 100%; /* 幅を全体に広げる */
+  background-color: transparent; /* 背景を透明にする */
+  border: none; /* ボーダーを削除 */
+  outline: none; /* フォーカス時の枠を削除 */
+  resize: none; /* サイズ変更を無効化 */
+}
+
+.editable-title:focus {
+  border-bottom: 2px solid #007bff; /* フォーカス時に下線を表示 */
+}
+
+.editable-input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  font-size: 16px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.email-detail-container h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.email-detail-container p {
+  margin: 5px 0;
+  line-height: 1.6;
+}
+
+.email-detail-container h2 {
+  margin-top: 20px;
+  font-size: 20px;
+}
+
+.editable-input,
+.editable-textarea {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  font-size: 16px;
+  background-color: transparent;
+  border: none; /* 枠をなくす */
+  border-radius: 0; /* 角丸をなくす */
+  resize: none; /* サイズ変更を無効化 */
+}
+
+.editable-input:focus,
+.editable-textarea:focus {
+  outline: none; /* フォーカス時の青い枠を削除 */
+}
+
+.editable-textarea {
+  min-height: 50px; /* 必要に応じて高さを設定 */
+  line-height: 1.5; /* テキストの行間を設定 */
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.send-email-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.send-email-button:hover {
+  background-color: #0056b3;
+}
