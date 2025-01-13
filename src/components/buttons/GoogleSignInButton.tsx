@@ -2,8 +2,10 @@ import React from "react";
 import { signIn } from "next-auth/react";
 
 export default function GoogleSignInButton() {
-  const handleGoogleSignIn = () => {
-    signIn("google");
+  const handleGoogleSignIn = async () => {
+    await signIn("google", {
+      callbackUrl: "/dashboard", // 認証後にリダイレクトするURL
+    });
   };
 
   return (
