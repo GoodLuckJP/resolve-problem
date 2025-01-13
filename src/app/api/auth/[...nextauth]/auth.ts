@@ -49,6 +49,52 @@ export const authOptions: AuthOptions = {
         }
       },
     }),
+    CredentialsProvider({
+      id: "register",
+      name: "Register",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials) {
+          throw new Error("資格情報が提供されていません");
+        }
+        const { email, password } = credentials;
+
+        try {
+          // ユーザーの存在確認
+          const checkQuery = "SELECT * FROM users WHERE email = $1";
+          const existingUser = await pool.query(checkQuery, [email]);
+
+          if (existingUser.rows.length > 0) {
+            throw new Error("既に登録済みのメールアドレスです");
+          }
+
+          // パスワードをハッシュ化
+          const hashedPassword = await bcrypt.hash(password, 10);
+
+          // ユーザーをデータベースに登録
+          const insertQuery = `
+            INSERT INTO users (email, password, provider)
+            VALUES ($1, $2, 'register') RETURNING id, email
+          `;
+          const newUser = await pool.query(insertQuery, [
+            email,
+            hashedPassword,
+          ]);
+
+          // 登録後のユーザー情報を返す
+          return {
+            id: String(newUser.rows[0].id),
+            email: newUser.rows[0].email,
+          };
+        } catch (error) {
+          console.error("登録エラー:", error);
+          throw new Error("登録に失敗しました");
+        }
+      },
+    }),
   ],
   session: {
     strategy: "jwt",

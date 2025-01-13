@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     // メール送信
     await transporter.sendMail({
       from: `"システム管理者" <${process.env.SMTP_USER}>`,
-      to: emailData.email,
+      to: `${emailData.email}, ${session.user.email}`,
       cc: emailData.cc || undefined,
       subject: emailData.title,
       html: emailContent,

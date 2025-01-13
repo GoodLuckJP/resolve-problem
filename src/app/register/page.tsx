@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import "../../../styles/auth.css";
 import GoogleSignInButton from "@/components/buttons/GoogleSignInButton";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -21,8 +20,8 @@ export default function RegisterPage() {
         password,
       });
 
-      if (!result?.error) {
-        redirect("/dashboard");
+      if (result?.ok) {
+        window.location.href = "/dashboard";
       }
     } catch (error) {
       console.error("登録エラー:", error);
