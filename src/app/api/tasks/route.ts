@@ -1,12 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { Pool } from "pg";
-import { authOptions } from "../auth/[...nextauth]/route";
-
-// PostgreSQL接続プール
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import { authOptions } from "../auth/[...nextauth]/auth";
+import pool from "@/lib/db";
 
 // すべてのタスクを取得 (GET)
 export async function GET() {

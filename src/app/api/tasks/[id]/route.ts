@@ -1,17 +1,12 @@
+import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { Pool } from "pg";
-
-// PostgreSQL接続プール
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 // 特定のタスクを取得 (GET)
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id;
+  const { id } = await params;
 
   try {
     const { rows } = await pool.query("SELECT * FROM tasks WHERE id = $1", [
@@ -33,9 +28,9 @@ export async function GET(
 // タスクを更新 (PUT)
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id;
+  const { id } = await params;
   const { title, description, status, visibility } = await req.json();
 
   try {
@@ -59,9 +54,9 @@ export async function PUT(
 // タスクを削除 (DELETE)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id;
+  const { id } = await params;
 
   try {
     await pool.query("DELETE FROM tasks WHERE id = $1", [id]);

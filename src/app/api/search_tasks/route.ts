@@ -1,5 +1,6 @@
+import pool from "@/lib/db";
+import { TaskSearch } from "@/type/task";
 import { NextRequest, NextResponse } from "next/server";
-import { Pool } from "pg";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -10,11 +11,6 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // PostgreSQL接続プール
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
-
     // 説明で一致するタスクを取得
     const descriptionResults = await pool.query(
       `
@@ -41,18 +37,21 @@ export async function GET(req: NextRequest) {
     );
 
     // 重複を排除しユニークな結果を作成
-    const combinedResults = [
+    const combinedResults: TaskSearch[] = [
       ...descriptionResults.rows,
       ...commentResults.rows,
     ];
 
-    const uniqueResults = combinedResults.reduce((acc, current) => {
-      const exists = acc.find((item: any) => item.id === current.id);
-      if (!exists) {
-        acc.push(current);
-      }
-      return acc;
-    }, []);
+    const uniqueResults = combinedResults.reduce<TaskSearch[]>(
+      (acc, current) => {
+        const exists = acc.find((item) => item.id === current.id);
+        if (!exists) {
+          acc.push(current);
+        }
+        return acc;
+      },
+      []
+    );
 
     return NextResponse.json(uniqueResults);
   } catch (error) {

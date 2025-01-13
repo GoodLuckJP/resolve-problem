@@ -13,3 +13,10 @@ export interface TaskDetail {
   description: string;
   visibility: boolean;
 }
+
+export interface TaskSearch {
+  id: number;
+  title: string;
+  description: string | null;
+  comment: string | null;
+}

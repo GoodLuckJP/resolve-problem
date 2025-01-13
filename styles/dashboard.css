@@ -1,89 +1,130 @@
-/* 全体コンテナ */
+/* Dashboard Container */
 .dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 24px;
   display: flex;
-  justify-content: center; /* 横方向の中央寄せ */
-  gap: 40px; /* メールセクションと証跡セクションの間の間隔 */
-  padding: 20px;
-  box-sizing: border-box;
-  background-color: #f5f5f5;
+  justify-content: center;
+  gap: 32px;
 }
 
-/* セクショングループ内のセクション全体で高さを揃える */
+/* Section Group */
 .section-group {
+  width: 480px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 24px;
 }
 
+/* Create Section - Fixed Height */
 .dashboard-create-section {
-  width: 400px; /* セクションの固定幅 */
-  height: 200px; /* 最小高さを設定 */
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  height: 200px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* 各セクションの高さを揃える */
+.dashboard-create-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* List Section - Flexible Height */
 .dashboard-section {
-  width: 400px; /* セクションの固定幅 */
-  min-height: 200px; /* 最小高さを設定 */
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  min-height: 200px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
+/* Headers */
+.dashboard-section h3,
+.dashboard-create-section h3 {
+  color: #1a1a1a;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 16px 0;
+}
+
+/* List Styling */
 .item-list {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
 }
 
 .item-list li {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #555;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border-radius: 12px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
 }
 
-/* ヘッダー */
-.dashboard-section h3 {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
+.item-list li:hover {
+  background: #f0f2f5;
+  transform: translateX(4px);
 }
 
-/* 丸いボタン */
+.item-list a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  display: block;
+  transition: color 0.3s ease;
+}
+
+.item-list a:hover {
+  color: #4338ca;
+}
+
+/* Create Button */
 .circle-button {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: #007bff;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: #4f46e5;
   color: white;
   font-size: 24px;
-  font-weight: bold;
   border: none;
   cursor: pointer;
   display: flex;
-  margin-bottom: 20px;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .circle-button:hover {
-  background-color: #0056b3;
-  transform: scale(1.1);
+  background: #4338ca;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.circle-button:active {
+  transform: scale(0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section-group {
+    width: 100%;
+    max-width: 480px;
+  }
 }

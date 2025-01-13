@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Pool } from "pg";
+
 import nodemailer from "nodemailer";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
-
-// PostgreSQL接続プール
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import { authOptions } from "../auth/[...nextauth]/auth";
+import pool from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();

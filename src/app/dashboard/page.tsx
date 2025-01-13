@@ -19,28 +19,34 @@ export default function DashboardPage() {
   const closeModal = (isCreated: boolean = false) => {
     setIsModalOpen(false);
     if (isCreated) {
-      fetchTasks(); // 作成後にリストを再取得
+      fetchTasks();
     }
   };
 
   const fetchTasks = async () => {
-    const res = await fetch(`/api/tasks`);
-    if (res.ok) {
-      const data = await res.json();
-      setTasks(data);
+    try {
+      const res = await fetch(`/api/tasks`);
+      if (res.ok) {
+        const data = await res.json();
+        setTasks(data);
+      }
+    } catch (error) {
+      console.error("証跡の取得に失敗しました:", error);
     }
   };
 
-  // メール一覧を取得
   const fetchEmails = async () => {
-    const res = await fetch(`/api/emails`);
-    if (res.ok) {
-      const data = await res.json();
-      setEmails(data);
+    try {
+      const res = await fetch(`/api/emails`);
+      if (res.ok) {
+        const data = await res.json();
+        setEmails(data);
+      }
+    } catch (error) {
+      console.error("メールの取得に失敗しました:", error);
     }
   };
 
-  // 初回取得
   useEffect(() => {
     if (user?.id) {
       fetchTasks();
@@ -49,48 +55,73 @@ export default function DashboardPage() {
   }, [user]);
 
   return (
-    <div className="dashboard-container">
-      {/* 左側: 証跡セクション */}
-      <div className="section-group">
-        <div className="dashboard-create-section">
-          <button className="circle-button" onClick={openModal}>
-            ＋
-          </button>
-          <h3>証跡内容作成</h3>
-        </div>
-        {isModalOpen && <TaskModal onClose={closeModal} />}
+    <main className="min-h-screen bg-gray-50">
+      <div className="dashboard-container">
+        {/* 証跡セクション */}
+        <div className="section-group">
+          <div className="dashboard-create-section">
+            <button
+              className="circle-button"
+              onClick={openModal}
+              aria-label="証跡を作成"
+            >
+              <span>＋</span>
+            </button>
+            <h3>証跡内容作成</h3>
+          </div>
+          {isModalOpen && <TaskModal onClose={closeModal} />}
 
-        <div className="dashboard-section">
-          <h3>証跡一覧</h3>
-          <ul className="item-list">
-            {tasks.map((task) => (
-              <li key={task.id}>
-                <Link href={`/task/${task.id}`}>{task.title}</Link>
-              </li>
-            ))}
-          </ul>
+          <div className="dashboard-section">
+            <h3>証跡一覧</h3>
+            {tasks.length > 0 ? (
+              <ul className="item-list">
+                {tasks.map((task) => (
+                  <li key={task.id}>
+                    <Link href={`/task/${task.id}`}>{task.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 text-center mt-4">
+                証跡がまだありません
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* メールセクション */}
+        <div className="section-group">
+          <div className="dashboard-create-section">
+            <Link
+              href="/email_form"
+              className="inline-block"
+              aria-label="メールを作成"
+            >
+              <button className="circle-button">
+                <span>＋</span>
+              </button>
+            </Link>
+            <h3>メール作成</h3>
+          </div>
+
+          <div className="dashboard-section">
+            <h3>メール一覧</h3>
+            {emails.length > 0 ? (
+              <ul className="item-list">
+                {emails.map((email) => (
+                  <li key={email.id}>
+                    <Link href={`/email/${email.id}`}>{email.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 text-center mt-4">
+                メールがまだありません
+              </p>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* 右側: メールセクション */}
-      <div className="section-group">
-        <div className="dashboard-create-section">
-          <Link href={`/email_form`}>
-            <button className="circle-button">＋</button>
-          </Link>
-          <h3>メール作成</h3>
-        </div>
-        <div className="dashboard-section">
-          <h3>メール一覧</h3>
-          <ul className="item-list">
-            {emails.map((email) => (
-              <li key={email.id}>
-                <Link href={`/email/${email.id}`}>{email.title}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }

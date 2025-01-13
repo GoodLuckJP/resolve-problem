@@ -1,3 +1,4 @@
+import { TEMPLATE_TYPES } from "@/lib/constant";
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
@@ -5,18 +6,13 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-export const TEMPLATE_TYPES = {
-  SPECIFICATION: { id: "1", name: "仕様の段階の質問" },
-  DEVELOPMENT: { id: "2", name: "開発での質問" },
-};
-
 // メール詳細取得
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const emailId = (await context.params)?.id; // params.id を安全に取得
-  if (!emailId) {
+  const { id } = await params;
+  if (!id) {
     return NextResponse.json(
       { error: "メールIDが提供されていません" },
       { status: 400 }
@@ -34,7 +30,7 @@ export async function GET(
       LEFT JOIN template_development td ON e.id = td.email_id
       WHERE e.id = $1
     `;
-    const { rows } = await pool.query(emailQuery, [emailId]);
+    const { rows } = await pool.query(emailQuery, [id]);
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -55,11 +51,11 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const emailId = (await context.params)?.id; // 非同期で params.id を取得
+  const { id } = await params;
 
-  if (!emailId) {
+  if (!id) {
     return NextResponse.json(
       { error: "メールIDが提供されていません" },
       { status: 400 }
@@ -98,7 +94,7 @@ export async function PUT(
     }
 
     if (updateFields.length > 0) {
-      updateValues.push(emailId); // 最後の値はID
+      updateValues.push(id); // 最後の値はID
       const emailQuery = `
         UPDATE emails
         SET ${updateFields.join(", ")}, updated_at = CURRENT_TIMESTAMP
@@ -125,7 +121,7 @@ export async function PUT(
       }
 
       if (specFields.length > 0) {
-        specValues.push(emailId); // 最後の値は email_id
+        specValues.push(id); // 最後の値は email_id
         const specQuery = `
           UPDATE template_specification
           SET ${specFields.join(", ")}
@@ -158,7 +154,7 @@ export async function PUT(
       }
 
       if (devFields.length > 0) {
-        devValues.push(emailId); // 最後の値は email_id
+        devValues.push(id); // 最後の値は email_id
         const devQuery = `
           UPDATE template_development
           SET ${devFields.join(", ")}
