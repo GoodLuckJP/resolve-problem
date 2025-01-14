@@ -77,7 +77,7 @@ export default function DashboardPage() {
               <ul className="item-list">
                 {tasks.map((task) => (
                   <li key={task.id}>
-                    <Link href={`/task/${task.id}`}>{task.title}</Link>
+                    <Link href={`/task/${task.bcrypt_id}`}>{task.title}</Link>
                   </li>
                 ))}
               </ul>
@@ -110,7 +110,9 @@ export default function DashboardPage() {
               <ul className="item-list">
                 {emails.map((email) => (
                   <li key={email.id}>
-                    <Link href={`/email/${email.id}`}>{email.title}</Link>
+                    <Link href={`/email/${email.bcrypt_id}`}>
+                      {email.title}
+                    </Link>
                   </li>
                 ))}
               </ul>

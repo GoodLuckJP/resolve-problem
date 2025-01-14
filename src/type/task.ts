@@ -2,7 +2,7 @@ export interface Task {
   id: number;
   title: string;
   description: string;
-  status: string;
+  bcrypt_id: string;
   visibility: boolean;
   is_completed: boolean;
 }
@@ -12,6 +12,8 @@ export interface TaskDetail {
   title: string;
   description: string;
   visibility: boolean;
+  is_completed: boolean;
+  bcrypt_id: string;
 }
 
 export interface TaskSearch {

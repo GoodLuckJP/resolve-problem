@@ -1,92 +1,277 @@
+/* Email Detail Container */
 .email-detail-container {
-  width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 32px;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.editable-title {
-  font-size: 32px; /* タイトルのフォントサイズを大きくする */
-  font-weight: bold; /* 太字にする */
-  margin-bottom: 20px;
-  width: 100%; /* 幅を全体に広げる */
-  background-color: transparent; /* 背景を透明にする */
-  border: none; /* ボーダーを削除 */
-  outline: none; /* フォーカス時の枠を削除 */
-  resize: none; /* サイズ変更を無効化 */
+/* Email Header */
+.email-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.editable-title:focus {
-  border-bottom: 2px solid #007bff; /* フォーカス時に下線を表示 */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
-.editable-input {
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-  font-size: 16px;
-  background-color: transparent;
-  border: none;
-  outline: none;
+.title-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.email-detail-container h1 {
+.title-input {
   font-size: 24px;
-  margin-bottom: 10px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  min-height: 40px;
+  transition: all 0.2s ease;
+  line-height: 1.4;
 }
 
-.email-detail-container p {
-  margin: 5px 0;
+.title-input:hover {
+  background: #f8f9fa;
+}
+
+.title-input:focus {
+  outline: none;
+  background: white;
+  border-color: #e5e7eb;
+}
+
+/* Save Status */
+.save-status {
+  font-size: 12px;
+  color: #6b7280;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  height: 16px;
+  margin-top: 4px;
+}
+
+.save-status.show {
+  opacity: 1;
+  color: #4caf50;
+}
+
+/* Send Button */
+.send-button {
+  padding: 10px 20px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.send-button:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.send-button:active {
+  transform: translateY(0);
+}
+
+/* Email Content */
+.email-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Email Section */
+.email-section {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.email-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.email-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 24px;
+}
+
+/* Field Groups */
+.field-group {
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
+.field-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+/* Text Inputs */
+.text-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: #f9fafb;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Template Type */
+.template-type {
+  font-size: 14px;
+  color: #374151;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.template-type label {
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+/* Rich Text Editor Overrides */
+.rich-editor {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.editor-toolbar {
+  padding: 8px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.toolbar-button {
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar-button:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.toolbar-button.is-active {
+  background: #e5e7eb;
+  color: #4f46e5;
+}
+
+.editor-content {
+  min-height: 120px;
+  width: 100%;
+}
+
+.ProseMirror {
+  min-height: 120px;
+  outline: none;
+  width: 100%;
+}
+
+.ProseMirror p {
+  margin: 0 0 1em 0;
   line-height: 1.6;
 }
 
-.email-detail-container h2 {
-  margin-top: 20px;
-  font-size: 20px;
+.ProseMirror p:last-child {
+  margin-bottom: 0;
 }
 
-.editable-input,
-.editable-textarea {
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-  font-size: 16px;
-  background-color: transparent;
-  border: none; /* 枠をなくす */
-  border-radius: 0; /* 角丸をなくす */
-  resize: none; /* サイズ変更を無効化 */
-}
-
-.editable-input:focus,
-.editable-textarea:focus {
-  outline: none; /* フォーカス時の青い枠を削除 */
-}
-
-.editable-textarea {
-  min-height: 50px; /* 必要に応じて高さを設定 */
-  line-height: 1.5; /* テキストの行間を設定 */
-}
-
-.task-header {
+/* Loading State */
+.loading-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  justify-content: center;
+  height: 200px;
+  color: #6b7280;
 }
 
-.send-email-button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
+.loading-spinner {
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #4f46e5;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
 }
 
-.send-email-button:hover {
-  background-color: #0056b3;
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .email-detail-container {
+    margin: 0;
+    padding: 20px;
+    border-radius: 0;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .send-button {
+    width: 100%;
+  }
 }
