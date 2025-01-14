@@ -29,6 +29,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  if (url.pathname.startsWith("/register") && isLoggedIn) {
+    console.log("ログイン済み。リダイレクト中: /dashboard");
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   // 通常のリクエストはそのまま続行
   return NextResponse.next();
 }
