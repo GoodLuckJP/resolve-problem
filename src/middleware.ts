@@ -3,7 +3,7 @@ import { getToken } from "next-auth/jwt";
 
 // ミドルウェアの適用範囲を指定
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"], // 適用するルート
+  matcher: ["/dashboard/:path*", "/login", "/register"], // 適用するルート
 };
 
 export async function middleware(request: NextRequest) {
