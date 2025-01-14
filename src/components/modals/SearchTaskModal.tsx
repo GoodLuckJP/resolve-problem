@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import RichTextEditor from "../editor/RichTextEditor";
 
 interface SearchTaskModalProps {
   task: {

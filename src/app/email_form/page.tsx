@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import "../../../styles/email-form.css";
-import SearchTaskModal from "@/components/modals/SearchTaskModal";
 import Link from "next/link";
 
 interface Suggestion {
