@@ -65,7 +65,6 @@ export default function TaskPage() {
           <li key={task.id} style={{ marginBottom: "10px" }}>
             <h3>{task.title}</h3>
             <p>{task.description}</p>
-            <p>状態: {task.status}</p>
             <p>公開: {task.visibility ? "公開" : "非公開"}</p>
             <p>完了: {task.is_completed ? "完了" : "未完了"}</p>
           </li>

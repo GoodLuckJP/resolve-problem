@@ -1,13 +1,15 @@
+import { decryptId } from "@/lib/crypto";
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 // コメント取得 (GET)
 export async function GET(req: NextRequest) {
-  const taskId = req.nextUrl.searchParams.get("task_id");
-
-  if (!taskId) {
+  const id = req.nextUrl.searchParams.get("task_id");
+  if (!id) {
     return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
   }
+
+  const taskId = decryptId(id);
 
   try {
     const { rows } = await pool.query(
@@ -32,7 +34,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const { task_id, user_id, content } = await req.json();
 
-  if (!task_id || !user_id || !content) {
+  const decodedTaskId = decodeURIComponent(task_id);
+  const id = decryptId(decodedTaskId);
+
+  if (!id || !user_id || !content) {
     return NextResponse.json(
       { error: "Task ID, User ID, and content are required" },
       { status: 400 }
@@ -44,7 +49,7 @@ export async function POST(req: NextRequest) {
       `INSERT INTO comments (task_id, user_id, content) 
        VALUES ($1, $2, $3) 
        RETURNING *`,
-      [task_id, user_id, content]
+      [id, user_id, content]
     );
     return NextResponse.json(rows[0]);
   } catch (error) {

@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     // 説明で一致するタスクを取得
     const descriptionResults = await pool.query(
       `
-      SELECT tasks.id, tasks.title, tasks.description, NULL AS comment
+      SELECT tasks.id, tasks.title, tasks.description, tasks.bcrypt_id, NULL AS comment
       FROM tasks
       WHERE tasks.visibility = TRUE
       AND tasks.description ILIKE $1

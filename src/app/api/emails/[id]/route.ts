@@ -1,4 +1,5 @@
 import { TEMPLATE_TYPES } from "@/lib/constant";
+import { decryptId } from "@/lib/crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
@@ -12,6 +13,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const emailId = decryptId(id);
   if (!id) {
     return NextResponse.json(
       { error: "メールIDが提供されていません" },
@@ -30,7 +32,7 @@ export async function GET(
       LEFT JOIN template_development td ON e.id = td.email_id
       WHERE e.id = $1
     `;
-    const { rows } = await pool.query(emailQuery, [id]);
+    const { rows } = await pool.query(emailQuery, [emailId]);
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -54,8 +56,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const emailId = decryptId(id);
 
-  if (!id) {
+  if (!emailId) {
     return NextResponse.json(
       { error: "メールIDが提供されていません" },
       { status: 400 }
@@ -94,7 +97,7 @@ export async function PUT(
     }
 
     if (updateFields.length > 0) {
-      updateValues.push(id); // 最後の値はID
+      updateValues.push(emailId); // 最後の値はID
       const emailQuery = `
         UPDATE emails
         SET ${updateFields.join(", ")}, updated_at = CURRENT_TIMESTAMP
@@ -121,7 +124,7 @@ export async function PUT(
       }
 
       if (specFields.length > 0) {
-        specValues.push(id); // 最後の値は email_id
+        specValues.push(emailId); // 最後の値は email_id
         const specQuery = `
           UPDATE template_specification
           SET ${specFields.join(", ")}
@@ -154,7 +157,7 @@ export async function PUT(
       }
 
       if (devFields.length > 0) {
-        devValues.push(id); // 最後の値は email_id
+        devValues.push(emailId); // 最後の値は email_id
         const devQuery = `
           UPDATE template_development
           SET ${devFields.join(", ")}

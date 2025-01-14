@@ -2,30 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import RichTextEditor from "@/components/editor/RichTextEditor";
 import "../../../../styles/email-detail.css";
+import { EmailDetail } from "@/type/email";
 
 const TEMPLATE_TYPES = {
   SPECIFICATION: { id: "1", name: "仕様の段階の質問" },
   DEVELOPMENT: { id: "2", name: "開発での質問" },
 };
 
-interface EmailDetail {
-  id: number;
-  title: string;
-  email: string;
-  cc: string | null;
-  template_type: string; // 数字の文字列
-  plan?: string;
-  confirmation?: string;
-  goal?: string;
-  known_info?: string;
-  question?: string;
-}
-
 export default function EmailDetailPage() {
   const params = useParams();
   const emailId = params.id;
   const [emailDetail, setEmailDetail] = useState<EmailDetail | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSaveStatus, setShowSaveStatus] = useState(false);
 
   useEffect(() => {
     const fetchEmailDetail = async () => {
@@ -67,10 +58,10 @@ export default function EmailDetailPage() {
   const handleFieldChange = async (field: string, value: string) => {
     if (!emailDetail) return;
 
-    // ローカルステートを更新
     setEmailDetail((prev) => (prev ? { ...prev, [field]: value } : prev));
+    setIsSaving(true);
+    setShowSaveStatus(false);
 
-    // サーバーに更新を送信
     try {
       const res = await fetch(`/api/emails/${emailId}`, {
         method: "PUT",
@@ -79,20 +70,32 @@ export default function EmailDetailPage() {
         },
         body: JSON.stringify({
           [field]: value,
-          template_type: emailDetail.template_type, // 常に template_type を送信
+          template_type: emailDetail.template_type,
         }),
       });
 
       if (!res.ok) {
         console.error("変更の保存に失敗しました");
+      } else {
+        setShowSaveStatus(true);
+        setTimeout(() => {
+          setShowSaveStatus(false);
+        }, 2000);
       }
     } catch (error) {
       console.error("通信エラー:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   if (!emailDetail) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   const templateTypeName = Object.values(TEMPLATE_TYPES).find(
@@ -101,101 +104,112 @@ export default function EmailDetailPage() {
 
   return (
     <div className="email-detail-container">
-      <div className="task-header">
-        <input
-          type="text"
-          value={emailDetail.title}
-          onChange={(e) => handleFieldChange("title", e.target.value)}
-          className="editable-title"
-        />
-        <button
-          type="button"
-          onClick={handleSendEmail}
-          className="send-email-button"
-        >
+      <div className="header-content">
+        <div className="title-wrapper">
+          <input
+            type="text"
+            value={emailDetail.title}
+            onChange={(e) => handleFieldChange("title", e.target.value)}
+            className="title-input"
+            placeholder="タイトルを入力"
+          />
+          <div className={`save-status ${showSaveStatus ? "show" : ""}`}>
+            {isSaving ? "保存中..." : "すべての変更を保存しました"}
+          </div>
+        </div>
+        <button type="button" onClick={handleSendEmail} className="send-button">
           メールを送信
         </button>
       </div>
 
-      <p>
-        <strong>宛先:</strong>
-        <input
-          type="email"
-          value={emailDetail.email}
-          onChange={(e) => handleFieldChange("email", e.target.value)}
-          className="editable-input"
-        />
-      </p>
+      <div className="email-content">
+        <div className="email-section">
+          <div className="section-header">
+            <h2>基本情報</h2>
+          </div>
+          <div className="section-content">
+            <div className="field-group">
+              <label>宛先</label>
+              <input
+                type="email"
+                value={emailDetail.email}
+                onChange={(e) => handleFieldChange("email", e.target.value)}
+                className="text-input"
+                placeholder="メールアドレスを入力"
+              />
+            </div>
+            <div className="field-group">
+              <label>CC</label>
+              <input
+                type="email"
+                value={emailDetail.cc || ""}
+                onChange={(e) => handleFieldChange("cc", e.target.value)}
+                className="text-input"
+                placeholder="CCのメールアドレスを入力"
+              />
+            </div>
+            <div className="field-group">
+              <label>テンプレートの種類</label>
+              <div className="template-type">{templateTypeName}</div>
+            </div>
+          </div>
+        </div>
 
-      {emailDetail.cc && (
-        <p>
-          <strong>CC:</strong>
-          <input
-            type="email"
-            value={emailDetail.cc}
-            onChange={(e) => handleFieldChange("cc", e.target.value)}
-            className="editable-input"
-          />
-        </p>
-      )}
+        {emailDetail.template_type === TEMPLATE_TYPES.SPECIFICATION.id && (
+          <div className="email-section">
+            <div className="section-header">
+              <h2>仕様確認内容</h2>
+            </div>
+            <div className="section-content">
+              <div className="field-group">
+                <label>プラン</label>
+                <RichTextEditor
+                  content={emailDetail.plan || ""}
+                  onChange={(value) => handleFieldChange("plan", value)}
+                />
+              </div>
+              <div className="field-group">
+                <label>確認内容</label>
+                <RichTextEditor
+                  content={emailDetail.confirmation || ""}
+                  onChange={(value) => handleFieldChange("confirmation", value)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
-      <p>
-        <strong>テンプレートの種類:</strong> {templateTypeName}
-      </p>
-
-      {emailDetail.template_type === TEMPLATE_TYPES.SPECIFICATION.id && (
-        <>
-          <h2>{TEMPLATE_TYPES.SPECIFICATION.name}</h2>
-          <p>
-            <strong>プラン:</strong>
-            <textarea
-              value={emailDetail.plan || ""}
-              onChange={(e) => handleFieldChange("plan", e.target.value)}
-              className="editable-textarea"
-            />
-          </p>
-          <p>
-            <strong>確認内容:</strong>
-            <textarea
-              value={emailDetail.confirmation || ""}
-              onChange={(e) =>
-                handleFieldChange("confirmation", e.target.value)
-              }
-              className="editable-textarea"
-            />
-          </p>
-        </>
-      )}
-
-      {emailDetail.template_type === TEMPLATE_TYPES.DEVELOPMENT.id && (
-        <>
-          <h2>{TEMPLATE_TYPES.DEVELOPMENT.name}</h2>
-          <p>
-            <strong>やりたいこと:</strong>
-            <textarea
-              value={emailDetail.goal || ""}
-              onChange={(e) => handleFieldChange("goal", e.target.value)}
-              className="editable-textarea"
-            />
-          </p>
-          <p>
-            <strong>わかっていること:</strong>
-            <textarea
-              value={emailDetail.known_info || ""}
-              onChange={(e) => handleFieldChange("known_info", e.target.value)}
-              className="editable-textarea"
-            />
-          </p>
-          <p>
-            <strong>質問内容:</strong>
-            <textarea
-              value={emailDetail.question || ""}
-              onChange={(e) => handleFieldChange("question", e.target.value)}
-              className="editable-textarea"
-            />
-          </p>
-        </>
-      )}
+        {emailDetail.template_type === TEMPLATE_TYPES.DEVELOPMENT.id && (
+          <div className="email-section">
+            <div className="section-header">
+              <h2>開発質問内容</h2>
+            </div>
+            <div className="section-content">
+              <div className="field-group">
+                <label>やりたいこと</label>
+                <RichTextEditor
+                  content={emailDetail.goal || ""}
+                  onChange={(value) => handleFieldChange("goal", value)}
+                />
+              </div>
+              <div className="field-group">
+                <label>わかっていること</label>
+                <RichTextEditor
+                  content={emailDetail.known_info || ""}
+                  onChange={(value) => handleFieldChange("known_info", value)}
+                />
+              </div>
+              <div className="field-group">
+                <label>質問内容</label>
+                <RichTextEditor
+                  content={emailDetail.question || ""}
+                  onChange={(value) => handleFieldChange("question", value)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

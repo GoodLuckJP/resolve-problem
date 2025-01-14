@@ -22,7 +22,7 @@ export async function GET() {
 
   try {
     const { rows } = await pool.query(
-      "SELECT id, title, email FROM emails WHERE user_id = $1 ORDER BY created_at DESC",
+      "SELECT id, title, email, bcrypt_id FROM emails WHERE user_id = $1 ORDER BY created_at DESC",
       [userId]
     );
     return NextResponse.json(rows);

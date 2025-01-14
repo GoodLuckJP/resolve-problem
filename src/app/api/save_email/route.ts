@@ -4,6 +4,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/auth";
 import pool from "@/lib/db";
 
+import { EmailTemplateData } from "@/type/email";
+import { encryptId } from "@/lib/crypto";
+import {
+  generateDevelopmentTemplate,
+  generateSpecificationTemplate,
+} from "@/lib/emailTempletes";
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
@@ -19,9 +26,9 @@ export async function POST(req: NextRequest) {
     send_email,
   } = body;
 
-  const session = await getServerSession(authOptions); // セッション情報を取得
+  const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || !session.user.id) {
+  if (!session?.user?.id) {
     return NextResponse.json(
       { error: "ユーザーが認証されていません" },
       { status: 401 }
@@ -32,11 +39,23 @@ export async function POST(req: NextRequest) {
 
   try {
     // メールデータを保存
-    const emailResult = await pool.query(
+    const result = await pool.query(
       "INSERT INTO emails (user_id, title, email, cc, template_type) VALUES ($1, $2, $3, $4, $5) RETURNING id",
       [userId, title, email, cc, template_type]
     );
-    const emailId = emailResult.rows[0].id;
+    const insertedId = result.rows[0].id;
+    const bcryptId = encryptId(insertedId);
+
+    await pool.query(`UPDATE emails SET bcrypt_id = $1 WHERE id = $2`, [
+      bcryptId,
+      insertedId,
+    ]);
+
+    const { rows } = await pool.query(`SELECT * FROM tasks WHERE id = $1`, [
+      insertedId,
+    ]);
+
+    const emailId = rows[0].id;
 
     // テンプレートごとのデータを保存
     if (template_type === 1) {
@@ -56,27 +75,31 @@ export async function POST(req: NextRequest) {
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
-        secure: false, // TLSを使用する場合はtrue
+        secure: false,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
       });
 
-      // メール本文の作成
-      let emailContent = `<h1>${title}</h1>`;
-      if (template_type === 1) {
-        emailContent += `
-          <p><strong>プラン:</strong> ${plan}</p>
-          <p><strong>確認内容:</strong> ${confirmation}</p>
-        `;
-      } else if (template_type === 2) {
-        emailContent += `
-          <p><strong>やりたいこと:</strong> ${goal}</p>
-          <p><strong>わかっていること:</strong> ${known_info}</p>
-          <p><strong>質問内容:</strong> ${question}</p>
-        `;
-      }
+      // EmailTemplateDataの作成
+      const emailData: EmailTemplateData = {
+        title,
+        email,
+        cc,
+        template_type: String(template_type), // 数値を文字列に変換
+        plan,
+        confirmation,
+        goal,
+        known_info,
+        question,
+      };
+
+      // テンプレートタイプに応じてHTMLを生成
+      const emailContent =
+        template_type === 1
+          ? generateSpecificationTemplate(emailData)
+          : generateDevelopmentTemplate(emailData);
 
       // メール送信
       await transporter.sendMail({

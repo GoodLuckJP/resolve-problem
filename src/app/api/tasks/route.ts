@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/auth";
 import pool from "@/lib/db";
+import { encryptId } from "@/lib/crypto";
 
 // すべてのタスクを取得 (GET)
 export async function GET() {
@@ -47,15 +48,27 @@ export async function POST(req: NextRequest) {
   }
 
   const userId = session.user.id;
-  const { title, description, status } = await req.json();
+  const { title, description } = await req.json();
 
   try {
-    const { rows } = await pool.query(
-      `INSERT INTO tasks (title, description, status, user_id) 
-       VALUES ($1, $2, $3, $4) 
+    const result = await pool.query(
+      `INSERT INTO tasks (title, description, user_id) 
+       VALUES ($1, $2, $3) 
        RETURNING *`,
-      [title, description, status, userId]
+      [title, description, userId]
     );
+
+    const insertedId = result.rows[0].id;
+    const bcryptId = encryptId(insertedId);
+    await pool.query(`UPDATE tasks SET bcrypt_id = $1 WHERE id = $2`, [
+      bcryptId,
+      insertedId,
+    ]);
+
+    const { rows } = await pool.query(`SELECT * FROM tasks WHERE id = $1`, [
+      insertedId,
+    ]);
+
     return NextResponse.json(rows[0], { status: 201 });
   } catch (error) {
     console.error("Failed to create task:", error);
